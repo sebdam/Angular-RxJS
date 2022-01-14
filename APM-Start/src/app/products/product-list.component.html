@@ -1,3 +1,9 @@
+
+<div class="alert alert-danger mt-2"
+  *ngIf="errorMessage$ | async as errorMessage">
+  {{ errorMessage }}
+</div>
+
 <div class="card">
   <div class="card-header">
     {{pageTitle}}
@@ -10,8 +16,8 @@
           <select class="form-control"
                   (change)="onSelected($event.target.value)">
             <option value="0">- Display All -</option>
-            <option *ngFor="let category of categories"
-                    [value]="category.id">{{ category.name }}</option>
+            <option *ngFor="let category of this.categories$ | async"
+                  [value]="category.id">{{ category.name }}</option>
           </select>
         </div>
         <div class="col-2">
@@ -22,9 +28,16 @@
       </div>
     </div>
 
+    <ng-template #loading>
+      <div *ngIf="!(errorMessage$ | async)" class="d-flex justify-content-center">
+        <div class="spinner-border m-2" role="status">
+        </div>
+      </div>
+    </ng-template>
+
     <div class="table-responsive">
       <table class="table mb-0"
-             *ngIf="products">
+        *ngIf="this.productsFiltered$ | async as products else loading">
         <thead>
           <tr>
             <th>Product</th>
@@ -38,7 +51,7 @@
           <tr>
             <td>{{ product.productName }}</td>
             <td>{{ product.productCode }}</td>
-            <td>{{ product.categoryId }}</td>
+            <td>{{ product.category }}</td>
             <td>{{ product.price | currency:"USD":"symbol":"1.2-2" }}</td>
             <td>{{ product.quantityInStock }}</td>
           </tr>
@@ -47,9 +60,4 @@
     </div>
 
   </div>
-</div>
-
-<div class="alert alert-danger"
-     *ngIf="errorMessage">
-  {{ errorMessage }}
 </div>
